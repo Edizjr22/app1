@@ -5,13 +5,19 @@ import { styles } from "../constants/Styles";
 import { nameToPic } from "../constants/Constants";
 import { useEffect } from "react";
 import { shuffle } from "../utils/ArrayUtils";
+import { Button } from "react-native-web";
 const names = Object.keys(nameToPic);
 
 export default function GameScreen() {
   // TODO: Declare and initialize state variables here, using "useState".
-
+  const [total, setTotal] = useState(0);
+  const [correct, setCorrect] = useState(0);
+  const [currName, setCurrName] = useState("");
+  const [name, setName] = useState(["","","",""]);
+  const [corrImage, setCorrImage] = useState('')
   // State for the timer is handled for you.
   const [timeLeft, setTimeLeft] = useState(5000);
+  
 
   // Called by the timer every 10 seconds
   const countDown = () => {
@@ -21,6 +27,9 @@ export default function GameScreen() {
     } else {
       // Time has expired
       // TODO: update appropriate state variables
+      setTimeLeft(5000)
+      setTotal(total + 1)
+      getNextRound()
     }
   };
 
@@ -44,13 +53,26 @@ export default function GameScreen() {
     nameOptions = shuffle(nameOptions);
 
     // TODO: Update state here.
-
-    setTimeLeft(5000);
+    setCorrImage(correctImage)
+    setCurrName(correctName)
+    setName(nameOptions)
+    setTimeLeft(5000)
   };
 
   // Called when user taps a name option.
   // TODO: Update correct # and total # state values.
-  const selectedNameChoice = (index) => {};
+  const selectedNameChoice = (index) => {
+    if (name[index] === currName) {
+      getNextRound()
+      setCorrect(correct + 1);
+      setTotal(total + 1)
+      setTimeLeft(5000)
+    } else {
+      getNextRound()
+      setTotal(total + 1)
+      setTimeLeft(5000)
+    }
+  };
 
   // Call the countDown() method every 10 milliseconds.
   useEffect(() => {
@@ -83,7 +105,7 @@ export default function GameScreen() {
         onPress={() => selectedNameChoice(j)}
       >
         <Text style={styles.buttonText}>
-          {/* TODO: Use something from state here. */}
+          {name[j]}
         </Text>
       </TouchableOpacity>
     );
@@ -95,9 +117,10 @@ export default function GameScreen() {
   return (
     <View>
       {/* TODO: Build out your UI using Text and Image components. */}
-      {/* Hint: What does the nameButtons list above hold? 
-          What types of objects is this list storing?
-          Try to get a sense of what's going on in the for loop above. */}
+      <Text style={styles.scoreText}>Current Score: {correct} / {total}</Text>
+      <Text style={styles.timerText}>Time Remaining: {timeRemainingStr} seconds</Text>
+      <Image style={styles.image} source={corrImage}></Image>
+      {nameButtons}
     </View>
   );
 }
